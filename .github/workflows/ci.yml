@@ -61,13 +61,10 @@ jobs:
 
   # Linux Build and Test
   build-linux:
-    name: Linux (Swift ${{ matrix.swift }})
+    name: Linux (Swift latest)
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        swift: ["6.0.3"]
     container:
-      image: swift:${{ matrix.swift }}
+      image: swift:latest
     steps:
       - uses: actions/checkout@v4
 
