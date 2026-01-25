@@ -37,7 +37,7 @@ public typealias SnapshotImage = NSImage
 #endif
 
 /// Snapshot class representing a captured page image.
-public struct Snapshot: Sendable {
+public struct Snapshot: @unchecked Sendable {
     public let image: SnapshotImage?
     public let timestamp: Date
 
