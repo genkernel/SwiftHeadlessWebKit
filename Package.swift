@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "WKZombie",
+    name: "SwiftHeadlessWebKit",
     platforms: [
         .macOS(.v12),
         .iOS(.v15),
@@ -13,11 +13,11 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "WKZombie",
+            name: "SwiftHeadlessWebKit",
             targets: ["WKZombie"]
         ),
         .library(
-            name: "WKZombieApple",
+            name: "SwiftHeadlessWebKitApple",
             targets: ["WKZombieApple"]
         )
     ],
