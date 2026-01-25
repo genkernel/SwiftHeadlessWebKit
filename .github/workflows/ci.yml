@@ -83,6 +83,32 @@ jobs:
             echo "⚠️ No test results file found" >> $GITHUB_STEP_SUMMARY
           fi
 
+          # Extract Uber Jobs test results
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Uber Jobs Extraction Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if grep -q "UBER_JOBS_" test-output.txt 2>/dev/null; then
+            echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+            HTML_LENGTH=$(grep "UBER_JOBS_HTML_LENGTH:" test-output.txt | head -1 | sed 's/.*UBER_JOBS_HTML_LENGTH: //' || echo "N/A")
+            TOTAL_ELEMENTS=$(grep "UBER_JOBS_TOTAL_ELEMENTS_FOUND:" test-output.txt | head -1 | sed 's/.*UBER_JOBS_TOTAL_ELEMENTS_FOUND: //' || echo "N/A")
+            EXTRACTED_COUNT=$(grep "UBER_JOBS_EXTRACTED_COUNT:" test-output.txt | head -1 | sed 's/.*UBER_JOBS_EXTRACTED_COUNT: //' || echo "N/A")
+            echo "| HTML Length | $HTML_LENGTH |" >> $GITHUB_STEP_SUMMARY
+            echo "| Elements Found | $TOTAL_ELEMENTS |" >> $GITHUB_STEP_SUMMARY
+            echo "| Jobs Extracted | $EXTRACTED_COUNT |" >> $GITHUB_STEP_SUMMARY
+
+            # Show extracted job titles if available
+            if grep -q "UBER_JOBS_EXTRACTED_TITLES:" test-output.txt 2>/dev/null; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "**Extracted Job Titles:**" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              grep -A 20 "UBER_JOBS_EXTRACTED_TITLES:" test-output.txt | head -15 >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "No Uber Jobs test data found in output" >> $GITHUB_STEP_SUMMARY
+          fi
+
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "<details><summary>📋 Test Output</summary>" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -242,6 +268,32 @@ jobs:
             echo "⚠️ No test results file found" >> $GITHUB_STEP_SUMMARY
           fi
 
+          # Extract Uber Jobs test results
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Uber Jobs Extraction Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if grep -q "UBER_JOBS_" test-output.txt 2>/dev/null; then
+            echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+            HTML_LENGTH=$(grep "UBER_JOBS_HTML_LENGTH:" test-output.txt | head -1 | sed 's/.*UBER_JOBS_HTML_LENGTH: //' || echo "N/A")
+            TOTAL_ELEMENTS=$(grep "UBER_JOBS_TOTAL_ELEMENTS_FOUND:" test-output.txt | head -1 | sed 's/.*UBER_JOBS_TOTAL_ELEMENTS_FOUND: //' || echo "N/A")
+            EXTRACTED_COUNT=$(grep "UBER_JOBS_EXTRACTED_COUNT:" test-output.txt | head -1 | sed 's/.*UBER_JOBS_EXTRACTED_COUNT: //' || echo "N/A")
+            echo "| HTML Length | $HTML_LENGTH |" >> $GITHUB_STEP_SUMMARY
+            echo "| Elements Found | $TOTAL_ELEMENTS |" >> $GITHUB_STEP_SUMMARY
+            echo "| Jobs Extracted | $EXTRACTED_COUNT |" >> $GITHUB_STEP_SUMMARY
+
+            # Show extracted job titles if available
+            if grep -q "UBER_JOBS_EXTRACTED_TITLES:" test-output.txt 2>/dev/null; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "**Extracted Job Titles:**" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              grep -A 20 "UBER_JOBS_EXTRACTED_TITLES:" test-output.txt | head -15 >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "No Uber Jobs test data found in output" >> $GITHUB_STEP_SUMMARY
+          fi
+
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "<details><summary>📋 Test Output</summary>" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -336,6 +388,28 @@ jobs:
               echo "" >> $GITHUB_STEP_SUMMARY
             fi
           done
+
+          # Uber Jobs Platform Comparison
+          echo "### Uber Jobs Platform Comparison" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Platform | HTML Length | Elements Found | Jobs Extracted |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------------|----------------|----------------|" >> $GITHUB_STEP_SUMMARY
+
+          for platform in macos linux; do
+            if [ -f "test-results/test-results-$platform/test-output.txt" ]; then
+              PLATFORM_EMOJI="🍎"
+              PLATFORM_NAME="macOS"
+              if [ "$platform" = "linux" ]; then
+                PLATFORM_EMOJI="🐧"
+                PLATFORM_NAME="Linux"
+              fi
+              HTML_LENGTH=$(grep "UBER_JOBS_HTML_LENGTH:" "test-results/test-results-$platform/test-output.txt" 2>/dev/null | head -1 | sed 's/.*UBER_JOBS_HTML_LENGTH: //' || echo "N/A")
+              TOTAL_ELEMENTS=$(grep "UBER_JOBS_TOTAL_ELEMENTS_FOUND:" "test-results/test-results-$platform/test-output.txt" 2>/dev/null | head -1 | sed 's/.*UBER_JOBS_TOTAL_ELEMENTS_FOUND: //' || echo "N/A")
+              EXTRACTED_COUNT=$(grep "UBER_JOBS_EXTRACTED_COUNT:" "test-results/test-results-$platform/test-output.txt" 2>/dev/null | head -1 | sed 's/.*UBER_JOBS_EXTRACTED_COUNT: //' || echo "N/A")
+              echo "| $PLATFORM_EMOJI $PLATFORM_NAME | $HTML_LENGTH | $TOTAL_ELEMENTS | $EXTRACTED_COUNT |" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+          echo "" >> $GITHUB_STEP_SUMMARY
 
           if [ "${{ steps.check.outputs.status }}" = "passed" ]; then
             echo "## ✅ All CI checks passed!" >> $GITHUB_STEP_SUMMARY
