@@ -1,6 +1,6 @@
 # SwiftHeadlessWebKit
 
-[![CI](https://github.com/anthropics/SwiftHeadlessWebKit/actions/workflows/ci.yml/badge.svg)](https://github.com/anthropics/SwiftHeadlessWebKit/actions/workflows/ci.yml)
+[![CI](https://github.com/ShawnBaek/SwiftHeadlessWebKit/actions/workflows/ci.yml/badge.svg)](https://github.com/ShawnBaek/SwiftHeadlessWebKit/actions/workflows/ci.yml)
 [![Swift 6](https://img.shields.io/badge/Swift-6.2-orange.svg?style=flat)](https://swift.org)
 [![SPM compatible](https://img.shields.io/badge/SPM-compatible-brightgreen.svg?style=flat)](https://github.com/apple/swift-package-manager)
 [![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20macOS%20%7C%20Linux-blue.svg?style=flat)](https://swift.org)
@@ -8,7 +8,7 @@
 
 > **This is a revamp of [WKZombie](https://github.com/mkoehnke/WKZombie)**, modernized for **Swift 6** with strict concurrency, the new **Swift Testing** framework, and **cross-platform support** including Linux for server-side Swift applications.
 >
-> Refactored by **[Claude Code](https://claude.ai/claude-code)** with **Spec Driven Kit** methodology.
+> Developed by **[Shawn Baek](https://github.com/ShawnBaek)** using **[Spec Kit](https://github.com/anthropics/claude-code)** methodology with **[Claude Code](https://claude.ai/claude-code)**.
 
 ---
 
@@ -55,7 +55,7 @@ Add to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/anthropics/SwiftHeadlessWebKit.git", from: "2.0.0")
+    .package(url: "https://github.com/ShawnBaek/SwiftHeadlessWebKit.git", from: "2.0.0")
 ]
 ```
 
@@ -102,7 +102,7 @@ Use `SwiftHeadlessWebKitApple` for full WebKit support with JavaScript execution
 
 File → Add Package Dependencies → Enter URL:
 ```
-https://github.com/anthropics/SwiftHeadlessWebKit.git
+https://github.com/ShawnBaek/SwiftHeadlessWebKit.git
 ```
 
 **2. Import and use in your app:**
@@ -196,7 +196,7 @@ let package = Package(
     platforms: [.macOS(.v12)],
     dependencies: [
         .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
-        .package(url: "https://github.com/anthropics/SwiftHeadlessWebKit.git", from: "2.0.0")
+        .package(url: "https://github.com/ShawnBaek/SwiftHeadlessWebKit.git", from: "2.0.0")
     ],
     targets: [
         .executableTarget(
@@ -507,12 +507,69 @@ let element = try await browser.get(by: .id("content"))(page).execute()
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+## Spec Kit - Development with Claude Code
+
+This project is developed using **Spec Kit** methodology, a specification-driven development approach with [Claude Code](https://claude.ai/claude-code).
+
+### What is Spec Kit?
+
+Spec Kit is a development methodology that uses structured specifications to guide AI-assisted development. It helps maintain consistency, quality, and clear communication between developers and AI assistants.
+
+### Guidelines for Claude Code
+
+When contributing to this project with Claude Code, follow these guidelines:
+
+#### 1. Specification-First Approach
+- Use `/speckit.specify` to define requirements before implementation
+- Write clear, testable specifications
+- Include platform-specific considerations (macOS, iOS, Linux)
+
+#### 2. Code Style
+- Follow Swift 6 conventions with strict concurrency
+- Use `async/await` for asynchronous operations
+- Mark types as `Sendable` where appropriate
+- Prefer composition over inheritance
+
+#### 3. Testing
+- Write tests using Swift Testing framework (`@Suite`, `@Test`, `#expect`)
+- Include platform comparison tests for cross-platform features
+- Use descriptive test names that explain the expected behavior
+
+#### 4. Documentation
+- Add documentation comments for public APIs
+- Include usage examples in documentation
+- Reference official documentation (e.g., WebKit, SwiftSoup)
+
+#### 5. CI/CD
+- Ensure all tests pass on macOS, iOS, and Linux
+- Check CI status before merging
+- Include test case names in reports for debugging
+
+### Example Spec Kit Commands
+
+```bash
+# Define a new feature specification
+/speckit.specify Add WebSocket support for real-time scraping
+
+# Check test coverage
+/speckit.specify check test cases for JavaScript rendering
+
+# Update CI configuration
+/speckit.specify update CI to include performance benchmarks
+```
+
 ## Credits
 
 - Original [WKZombie](https://github.com/mkoehnke/WKZombie) by [Mathias Köhnke](https://twitter.com/mkoehnke)
-- Swift 6 migration and modernization by [Claude Code](https://claude.ai/claude-code)
+- Swift 6 migration, Linux support, and modernization by [Shawn Baek](https://github.com/ShawnBaek)
+- AI-assisted development powered by [Claude Code](https://claude.ai/claude-code)
 - HTML parsing powered by [SwiftSoup](https://github.com/scinfu/SwiftSoup)
+- WebKit bindings reference: [WebKit](https://github.com/WebKit/WebKit)
 
 ## License
 
 SwiftHeadlessWebKit is available under the MIT license. See the [LICENSE](LICENSE) file for more info.
+
+---
+
+**Copyright (c) 2025 Shawn Baek**
