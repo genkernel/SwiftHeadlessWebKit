@@ -4,13 +4,13 @@
 
 module CWebKit [system] {
     // WPE WebKit - Headless WebKit for embedded/server use (recommended)
-    header "WPEWebKit.h"
+    header "include/WPEWebKit.h"
 
     // WebKitGTK - WebKit with GTK integration
-    header "WebKitGTK.h"
+    header "include/WebKitGTK.h"
 
     // JavaScriptCore - WebKit's JavaScript engine
-    header "JavaScriptCore.h"
+    header "include/JavaScriptCore.h"
 
     export *
 }
