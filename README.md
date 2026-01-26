@@ -112,7 +112,7 @@ This project uses **Spec Kit** methodology with Claude Code:
 
 ```bash
 # Define new features
-/speckit.specify Add WebSocket support
+/speckit.specify Add JS Rendering support
 
 # Check test cases
 /speckit.specify check test cases for JavaScript rendering
