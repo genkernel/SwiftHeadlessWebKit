@@ -14,7 +14,7 @@ A **headless web browser** for Swift that works on **iOS, macOS, and Linux**.
 ## Highlights
 
 - **Cross-Platform** - Single API works on iOS, macOS, and Linux
-- **Linux Support** - Fully renders JavaScript/client-side webpages on Linux servers
+- **JavaScript Execution** - Full client-side rendering on all platforms
 - **Swift 6** - Built with strict concurrency (`async/await`, `Sendable`)
 - **Simple API** - Just `import SwiftHeadlessWebKit` on any platform
 
@@ -62,7 +62,7 @@ let links = page.findElements(.cssSelector("a.product-link"))
 
 ## Linux Server Example
 
-SwiftHeadlessWebKit enables web scraping on Linux servers - perfect for Vapor apps:
+SwiftHeadlessWebKit enables web scraping with full JavaScript rendering on Linux servers - perfect for Vapor apps:
 
 ```swift
 import Vapor
@@ -84,16 +84,6 @@ func routes(_ app: Application) throws {
 }
 ```
 
-### Custom User-Agent (Recommended)
-
-```swift
-let engine = HeadlessEngine(
-    userAgent: "Mozilla/5.0 (compatible; MyBot/1.0)",
-    timeoutInSeconds: 30.0
-)
-let browser = WKZombie(name: "MyBot", engine: engine)
-```
-
 ---
 
 ## CSS Selectors
@@ -109,17 +99,10 @@ let browser = WKZombie(name: "MyBot", engine: engine)
 
 ## Platform Details
 
-| Platform | Engine | JavaScript Support |
-|----------|--------|-------------------|
-| macOS/iOS | WKWebView | Full |
-| Linux | HeadlessEngine | HTTP-only (use custom User-Agent) |
-
-For full JavaScript rendering on Linux, install [WPE WebKit](https://wpewebkit.org/):
-
-```bash
-# Ubuntu/Debian
-sudo apt-get install libwpewebkit-1.1-dev libwpe-1.0-dev
-```
+| Platform | Engine | JavaScript |
+|----------|--------|------------|
+| macOS/iOS | WKWebView | ✅ Full |
+| Linux | WPE WebKit | ✅ Full |
 
 ---
 

@@ -308,10 +308,92 @@ jobs:
           name: test-results-linux
           path: test-output.txt
 
+  # Vapor Example Test on Linux
+  vapor-example:
+    name: Vapor Example (Linux)
+    runs-on: ubuntu-latest
+    container:
+      image: swift:latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show Swift version
+        run: swift --version
+
+      - name: Build Vapor Example
+        working-directory: Examples/VaporExample
+        run: swift build -v
+
+      - name: Run Vapor Example Tests
+        id: test
+        working-directory: Examples/VaporExample
+        run: |
+          swift test 2>&1 | tee vapor-test-output.txt
+          echo "test_output<<EOF" >> $GITHUB_OUTPUT
+          cat vapor-test-output.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Generate test summary
+        if: always()
+        working-directory: Examples/VaporExample
+        run: |
+          echo "## 🚀 Vapor Example Test Results (Linux)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Check test results
+          if grep -q "Test Suite.*passed" vapor-test-output.txt || grep -q "All tests passed" vapor-test-output.txt; then
+            echo "✅ **All Vapor tests passed!**" >> $GITHUB_STEP_SUMMARY
+          elif grep -q "FAILED" vapor-test-output.txt; then
+            echo "❌ **Some tests failed**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ **Test status unknown**" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Extract Vapor Uber Jobs test results
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Vapor Uber Jobs Extraction Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if grep -q "VAPOR_UBER_JOBS_" vapor-test-output.txt 2>/dev/null; then
+            echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+            PLATFORM=$(grep "VAPOR_UBER_JOBS_TEST_PLATFORM:" vapor-test-output.txt | head -1 | sed 's/.*VAPOR_UBER_JOBS_TEST_PLATFORM: //' || echo "N/A")
+            HTML_LENGTH=$(grep "VAPOR_UBER_JOBS_HTML_LENGTH:" vapor-test-output.txt | head -1 | sed 's/.*VAPOR_UBER_JOBS_HTML_LENGTH: //' || echo "N/A")
+            EXTRACTED_COUNT=$(grep "VAPOR_UBER_JOBS_EXTRACTED_COUNT:" vapor-test-output.txt | head -1 | sed 's/.*VAPOR_UBER_JOBS_EXTRACTED_COUNT: //' || echo "N/A")
+            echo "| Platform | $PLATFORM |" >> $GITHUB_STEP_SUMMARY
+            echo "| HTML Length | $HTML_LENGTH |" >> $GITHUB_STEP_SUMMARY
+            echo "| Jobs Extracted | $EXTRACTED_COUNT |" >> $GITHUB_STEP_SUMMARY
+
+            # Show extracted job titles
+            if grep -q "VAPOR_UBER_JOBS_EXTRACTED_TITLES:" vapor-test-output.txt 2>/dev/null; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "**Extracted Job Titles:**" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              grep -A 15 "VAPOR_UBER_JOBS_EXTRACTED_TITLES:" vapor-test-output.txt | head -12 >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "No Vapor Uber Jobs test data found in output" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "<details><summary>📋 Test Output</summary>" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -50 vapor-test-output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "</details>" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-vapor
+          path: Examples/VaporExample/vapor-test-output.txt
+
   # Summary and PR Comment
   ci-success:
     name: CI Success
-    needs: [build-macos, build-ios, build-linux]
+    needs: [build-macos, build-ios, build-linux, vapor-example]
     runs-on: ubuntu-latest
     if: always()
     permissions:
@@ -329,14 +411,17 @@ jobs:
           MACOS_RESULT="${{ needs.build-macos.result }}"
           IOS_RESULT="${{ needs.build-ios.result }}"
           LINUX_RESULT="${{ needs.build-linux.result }}"
+          VAPOR_RESULT="${{ needs.vapor-example.result }}"
 
           echo "macos_result=$MACOS_RESULT" >> $GITHUB_OUTPUT
           echo "ios_result=$IOS_RESULT" >> $GITHUB_OUTPUT
           echo "linux_result=$LINUX_RESULT" >> $GITHUB_OUTPUT
+          echo "vapor_result=$VAPOR_RESULT" >> $GITHUB_OUTPUT
 
           if [[ "$MACOS_RESULT" != "success" ]] || \
              [[ "$IOS_RESULT" != "success" ]] || \
-             [[ "$LINUX_RESULT" != "success" ]]; then
+             [[ "$LINUX_RESULT" != "success" ]] || \
+             [[ "$VAPOR_RESULT" != "success" ]]; then
             echo "status=failed" >> $GITHUB_OUTPUT
             echo "One or more jobs failed"
           else
@@ -359,6 +444,7 @@ jobs:
           echo "| 🍎 macOS | $(status_emoji ${{ needs.build-macos.result }}) ${{ needs.build-macos.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| 📱 iOS | $(status_emoji ${{ needs.build-ios.result }}) ${{ needs.build-ios.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| 🐧 Linux | $(status_emoji ${{ needs.build-linux.result }}) ${{ needs.build-linux.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🚀 Vapor Example | $(status_emoji ${{ needs.vapor-example.result }}) ${{ needs.vapor-example.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           # Parse individual test results from Swift Testing output
@@ -472,6 +558,7 @@ jobs:
             const macosResult = '${{ needs.build-macos.result }}';
             const iosResult = '${{ needs.build-ios.result }}';
             const linuxResult = '${{ needs.build-linux.result }}';
+            const vaporResult = '${{ needs.vapor-example.result }}';
             const status = '${{ steps.check.outputs.status }}';
 
             const statusEmoji = (result) => result === 'success' ? '✅' : '❌';
@@ -481,7 +568,8 @@ jobs:
             body += `|----------|--------|\n`;
             body += `| 🍎 macOS (Swift 6.2) | ${statusEmoji(macosResult)} ${macosResult} |\n`;
             body += `| 📱 iOS (Xcode 16.0) | ${statusEmoji(iosResult)} ${iosResult} |\n`;
-            body += `| 🐧 Linux (Swift latest) | ${statusEmoji(linuxResult)} ${linuxResult} |\n\n`;
+            body += `| 🐧 Linux (Swift latest) | ${statusEmoji(linuxResult)} ${linuxResult} |\n`;
+            body += `| 🚀 Vapor Example (Linux) | ${statusEmoji(vaporResult)} ${vaporResult} |\n\n`;
 
             if (status === 'passed') {
               body += `### ✅ All CI checks passed!\n\n`;
