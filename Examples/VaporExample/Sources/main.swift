@@ -56,7 +56,7 @@ func routes(_ app: Application) throws {
 
         let page: HTMLPage = try await browser.open(careersURL).execute()
 
-        let html = page.data?.toString() ?? ""
+        let html = page.data.flatMap { String(data: $0, encoding: .utf8) } ?? ""
         var jobs: [Job] = []
 
         // Extract jobs using CSS selector
@@ -107,7 +107,7 @@ func routes(_ app: Application) throws {
         let browser = WKZombie(name: "VaporScraper", engine: engine)
 
         let page: HTMLPage = try await browser.open(url).execute()
-        let html = page.data?.toString() ?? ""
+        let html = page.data.flatMap { String(data: $0, encoding: .utf8) } ?? ""
 
         // Extract all links
         var jobs: [Job] = []
